@@ -58,8 +58,28 @@ public class MemorySpace {
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
 	public int malloc(int length) {		
-		//// Replace the following statement with your code
-		return -1;
+		ListIterator  itr = freeList.iterator();
+		MemoryBlock currentBlock = null;
+		while (itr.hasNext() ) {
+			 currentBlock = itr.next();
+			 if (currentBlock.length >= length) {
+				break;
+			 }
+			currentBlock = null; 
+		}
+		if (currentBlock == null) {
+			return -1;
+		}
+		MemoryBlock newblock = new MemoryBlock(currentBlock.baseAddress,length);
+		if(currentBlock.length == length) {
+			freeList.remove(currentBlock);
+		}
+		else {
+			currentBlock.baseAddress += length;
+			currentBlock.length -= length;
+		}
+		allocatedList.addLast(newblock);
+		return newblock.baseAddress;
 	}
 
 	/**
@@ -71,7 +91,21 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
+		ListIterator itr = allocatedList.iterator();
+		if (allocatedList.getSize() == 0) {
+			throw new IllegalArgumentException(
+				"index must be between 0 and size");
+		}
+		while (itr.hasNext() && itr.current.block.baseAddress != address) {
+			itr.next();
+		}
+		if (itr.current == null) {
+			return;
+		}
+		Node cur = itr.current; 
+		MemoryBlock newBlock = new MemoryBlock(address, cur.block.length);
+		allocatedList.remove(cur);
+		freeList.addLast(newBlock);
 	}
 	
 	/**
@@ -88,7 +122,23 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		/// TODO: Implement defrag test
-		//// Write your code here
+		
+		for (int i = 0; i < freeList.getSize(); i++) {
+			MemoryBlock currentBlock = freeList.getBlock(i);
+			int endAddress = currentBlock.baseAddress + currentBlock.length;
+			Node node = freeList.getFirst(); 
+			while (node != null) {
+			
+				MemoryBlock nextBlock = node.block;
+				if (nextBlock.baseAddress == endAddress) 
+				{
+				currentBlock.length += nextBlock.length;
+				freeList.remove(node); 
+				defrag();
+				break;
+				}
+				node = node.next;
+			}
+		}
 	}
 }
