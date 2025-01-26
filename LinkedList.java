@@ -60,20 +60,15 @@ public class LinkedList {
 			throw new IllegalArgumentException(
 					"index must be between 0 and size");
 		}
-		if (index == 0) {
-			return this.first;
-		}
-		if (index == size - 1) {
-			return this.last;
-		}
+		
 		Node current = this.first;
 		for (int counter = 0; counter < size; counter++) {
 			if (counter == index) {
-				return current;
+				break;
 			}
 			current = current.next;
 		}
-		return null;
+		return current;
 	}
 	
 	/**
@@ -102,14 +97,14 @@ public class LinkedList {
 		}
 		Node newNode = new Node(block);
 		if (index == 0) {
-			addFirst(block);
+			this.addFirst(block);
 		} else if (index == size) {
-			addLast(block);
+			this.addLast(block);
 		} else {
 			Node current = getNode(index - 1);
 			newNode.next = current.next;
 			current.next = newNode;
-			size++;
+			this.size++;
 		}
 		
 	}
@@ -124,13 +119,13 @@ public class LinkedList {
 	public void addLast(MemoryBlock block) {
 		Node newNode = new Node(block);
 		if (size == 0) {
-			first = newNode;
-			last = newNode;
+			this.first = newNode;
+			this.last = newNode;
 		} else {
-			last.next = newNode;
-			last = newNode;
+			this.last.next = newNode;
+			this.last = newNode;
 		}
-		size ++;
+		this.size ++;
 	}
 	
 	/**
@@ -143,13 +138,13 @@ public class LinkedList {
 	public void addFirst(MemoryBlock block) {
 		Node newNode = new Node(block);
 		if (size == 0) {
-			first = newNode;
-			last = newNode;
+			this.first = newNode;
+			this.last = newNode;
 		} else {
 			newNode.next = first;
-			first = newNode;
+			this.first = newNode;
 		}
-		size ++;
+		this.size ++;
 	}
 
 	/**
@@ -253,17 +248,13 @@ public class LinkedList {
 	 * A textual representation of this list, for debugging.
 	 */
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
- 	   	sb.append("[");
+		if (this.first == null) return "";
+		String res = "";
 		Node current = first;
 		while (current != null) {
-			sb.append(current.block);
-			if (current.next != null) {
-				sb.append(", ");
-			}
+			res += current.toString() + " ";
 			current = current.next;
 		}
-		sb.append("]");
-		return sb.toString();
+		return res;
 	}
 }

@@ -59,27 +59,23 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {		
 		ListIterator  itr = freeList.iterator();
-		MemoryBlock currentBlock = null;
+		
 		while (itr.hasNext() ) {
-			 currentBlock = itr.next();
-			 if (currentBlock.length >= length) {
-				break;
-			 }
-			currentBlock = null; 
+			MemoryBlock m = itr.next();
+			if (m.length > length) {
+				MemoryBlock newBlock = new MemoryBlock(m.baseAddress, length);
+				allocatedList.addLast(newBlock);
+				m.baseAddress = m.baseAddress + length;
+				m.length = m.length - length;
+				return newBlock.baseAddress;
+			}
+			else if (m.length == length) {
+				freeList.remove(m);
+				allocatedList.addLast(m);
+				return m.baseAddress;
+			}
 		}
-		if (currentBlock == null) {
-			return -1;
-		}
-		MemoryBlock newblock = new MemoryBlock(currentBlock.baseAddress,length);
-		if(currentBlock.length == length) {
-			freeList.remove(currentBlock);
-		}
-		else {
-			currentBlock.baseAddress += length;
-			currentBlock.length -= length;
-		}
-		allocatedList.addLast(newblock);
-		return newblock.baseAddress;
+		return -1;
 	}
 
 	/**
